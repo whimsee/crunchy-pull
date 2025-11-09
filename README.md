@@ -15,4 +15,4 @@ As such, it has its limitations and quirks:
 * CR isn't fully on top of its metadata so certain info are inaccurate or misleading. Make sure to check after pulling subs.
 
 
-This is probably the only version I'll publish to avoid potential trouble with accessing the CR API for data extraction. Feel free to edit this code for your specific purposes.
+This is probably the only version I'll publish to avoid potential trouble with accessing the CR API for data extraction. Some bugs may still be present but it works for my use case. Feel free to edit this code for your specific purposes.
