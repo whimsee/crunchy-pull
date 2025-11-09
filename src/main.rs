@@ -69,7 +69,7 @@ async fn main() -> Result<()> {
     // Loops through links starting from the second line
     if let Ok(lines) = read_lines("./links.txt") {
         for link in lines.map_while(Result::ok) {
-            if link.starts_with("## THIS IS SKIPPED") {
+            if link.starts_with("## THIS LINE IS SKIPPED") {
                 continue;
             }
             println!("Processing {}", link);
