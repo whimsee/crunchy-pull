@@ -204,10 +204,13 @@ async fn main() -> Result<()> {
                                     println!("FOUND CH audio");
                                     episode_id = episode_version.id.clone();
                                     break;
-                                } else if episode_version.audio_locale == Locale::en_US {
-                                    println!("FOUND EN audio");
-                                    episode_id = episode_version.id.clone();
-                                    break;
+                                    // } else if episode_version.audio_locale == Locale::en_US {
+                                    //     println!("FOUND EN audio");
+                                    //     episode_id = episode_version.id.clone();
+                                    //     break;
+                                } else {
+                                    // dbg!(&episode_version);
+                                    panic!("NO SUITABLE LOCALE FOUND");
                                 }
                             }
 
