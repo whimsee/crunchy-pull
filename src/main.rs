@@ -264,6 +264,7 @@ async fn main() -> Result<()> {
                                 if stream.subtitles.contains_key(&Locale::en_US) {
                                     println!("English subs available");
                                 } else {
+                                    stream.invalidate().await?;
                                     panic!("English subs unavailable");
                                 }
 
