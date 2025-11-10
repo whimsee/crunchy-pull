@@ -192,9 +192,10 @@ async fn main() -> Result<()> {
                             let mut episode_id: String = Default::default();
 
                             episode_list.insert(episode_number.clone(), episode_title);
+                            let mut en_found = false;
 
                             // Each audio locale has a unique id which contains its respective subs
-                            // Common audiol ocales are ja_JP, zh_CN, and en_US in decreasing priority for pulling.
+                            // Common audio locales are ja_JP, zh_CN, and en_US in decreasing priority for pulling.
                             for episode_version in &episode.versions {
                                 if episode_version.audio_locale == Locale::ja_JP {
                                     println!("FOUND JP audio");
@@ -204,15 +205,29 @@ async fn main() -> Result<()> {
                                     println!("FOUND CH audio");
                                     episode_id = episode_version.id.clone();
                                     break;
-                                    // } else if episode_version.audio_locale == Locale::en_US {
-                                    //     println!("FOUND EN audio");
-                                    //     episode_id = episode_version.id.clone();
-                                    //     break;
-                                } else {
-                                    // dbg!(&episode_version);
-                                    panic!("NO SUITABLE LOCALE FOUND");
+                                } else if episode_version.audio_locale == Locale::en_US {
+                                    println!("FOUND EN audio -- Checking for other audio locales");
+                                    episode_id = episode_version.id.clone();
+                                    en_found = true;
+                                    break;
                                 }
-                            }
+
+                                // EN only audio locales tend to have the other locales within stream
+                                // They have another version struct that can be scanned for the right audio stream
+                                if en_found {
+                                    let episode: Episode = crunchyroll.media_from_id(&episode_id).await?;
+                                    let stream = episode.stream().await?;
+
+                                    for versions in &stream.versions {
+                                        if versions.audio_locale == Locale::ja_JP {
+                                            println!("JP audio available");
+                                            println!("{}",versions.id);
+                                            episode_id = versions.id.clone();
+                                        }
+                                    }
+                                    // This tends to ensure that the rate limit is not exceeded
+                                    stream.invalidate().await?;
+                                }
 
                             // Removes illegal filename characters and pre-truncates them to be under 255 characters
                             let sanitize_episode_title = sanitize_filename::sanitize_with_options(episode_title, sanitize_options.clone()).replace(" ","_");
