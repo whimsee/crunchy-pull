@@ -211,23 +211,24 @@ async fn main() -> Result<()> {
                                     en_found = true;
                                     break;
                                 }
+                            }
 
-                                // EN only audio locales tend to have the other locales within stream
-                                // They have another version struct that can be scanned for the right audio stream
-                                if en_found {
-                                    let episode: Episode = crunchyroll.media_from_id(&episode_id).await?;
-                                    let stream = episode.stream().await?;
+                            // EN only audio locales tend to have the other locales within stream
+                            // They have another version struct that can be scanned for the right audio stream
+                            if en_found {
+                                let episode: Episode = crunchyroll.media_from_id(&episode_id).await?;
+                                let stream = episode.stream().await?;
 
-                                    for versions in &stream.versions {
-                                        if versions.audio_locale == Locale::ja_JP {
-                                            println!("JP audio available");
-                                            println!("{}",versions.id);
-                                            episode_id = versions.id.clone();
-                                        }
+                                for versions in &stream.versions {
+                                    if versions.audio_locale == Locale::ja_JP {
+                                        println!("JP audio available");
+                                        println!("{}",versions.id);
+                                        episode_id = versions.id.clone();
                                     }
-                                    // This tends to ensure that the rate limit is not exceeded
-                                    stream.invalidate().await?;
                                 }
+                                // This tends to ensure that the rate limit is not exceeded
+                                stream.invalidate().await?;
+                            }
 
                             // Removes illegal filename characters and pre-truncates them to be under 255 characters
                             let sanitize_episode_title = sanitize_filename::sanitize_with_options(episode_title, sanitize_options.clone()).replace(" ","_");
