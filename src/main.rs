@@ -284,6 +284,15 @@ async fn main() -> Result<()> {
                                     println!("English subs available");
                                 } else {
                                     stream.invalidate().await?;
+                                    // Checks if the EP is a PV, classified as a clip
+                                    // Some PVs are subbed, some are not (Gintama)
+                                    // If unsubbed PV, skip. Otherwise, panic.
+                                    if episode.is_clip {
+                                        println!("Episode is PV. Skipping");
+                                        episode_links.remove(&episode_number);
+                                        episode_list.remove(&episode_number);
+                                        continue;
+                                    }
                                     panic!("English subs unavailable");
                                 }
 
