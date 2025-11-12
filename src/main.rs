@@ -286,14 +286,22 @@ async fn main() -> Result<()> {
                                     stream.invalidate().await?;
                                     // Checks if the EP is a PV, classified as a clip
                                     // Some PVs are subbed, some are not (Gintama)
-                                    // If unsubbed PV, skip. Otherwise, panic.
+                                    // If unsubbed PV, skip and note as PV.
                                     if episode.is_clip {
                                         println!("Episode is PV. Skipping");
                                         episode_links.remove(&episode_number);
                                         episode_list.remove(&episode_number);
                                         continue;
+                                    } else {
+                                        // Or skip anyway because it's likely a hardsub
+                                        // CR doesn't identify hardsubs in a deterministic way
+                                        // but some hardsub eps may come up between softsubbed eps
+                                        // This should be the only instance where a subbed ep is skipped.
+                                        println!("No subs. Ep is probably a hardsub. Skipping");
+                                        episode_links.remove(&episode_number);
+                                        episode_list.remove(&episode_number);
+                                        continue;
                                     }
-                                    panic!("English subs unavailable");
                                 }
 
                                 let sub_url = &stream.subtitles.clone()[&Locale::en_US].url;
